@@ -21,7 +21,6 @@ let
     git
     gitAndTools.hub
     nix-prefetch-git
-    nixStable
     openssh
   ];
 
@@ -66,15 +65,6 @@ let
         rev = "480a73137e9b38ad3f1bc2c628847953d2fb3e25";
         sha256 = "0dpwi5ffs88brl3lz51bwb004c6zm8ds8pkw1vzsg2a6aaiyhlzl";
       }) {});
-
-    monoidal-containers =
-      let src = pkgs.fetchFromGitHub {
-            owner = "obsidiansystems";
-            repo = "monoidal-containers";
-            rev = "af5f6cedd1acd8725b19fd6a0277f83906603491";
-            sha256 = "11v20ing8lrb5ccf6g9iihwcw5d22yj2ifw15v04ypn19y8kariw";
-          };
-      in pkgs.haskell.lib.dontCheck (self.callCabal2nix "monoidal-containers" src {});
 
     # Need deriveSomeUniverse
     # PR: https://github.com/dmwit/universe/pull/32
@@ -253,6 +243,9 @@ rec {
                           , ios ? null #TODO: Better error when missing
                           , packages ? {}
                           , overrides ? _: _: {}
+                          , tools ? _: []
+                          , shellToolOverrides ? _: _: {}
+                          , withHoogle ? false # Setting this to `true` makes shell reloading far slower
                           }:
               let frontendName = "frontend";
                   backendName = "backend";
@@ -272,6 +265,7 @@ rec {
                   };
                   totalOverrides = composeExtensions (composeExtensions defaultHaskellOverrides projectOverrides) overrides;
               in {
+                inherit shellToolOverrides tools withHoogle;
                 overrides = totalOverrides;
                 packages = combinedPackages;
                 shells = {
@@ -289,7 +283,6 @@ rec {
                     commonName
                   ];
                 };
-                withHoogle = false; # Setting this to `true` makes shell reloading far slower
                 android = {
                   ${if android == null then null else frontendName} = {
                     executableName = "frontend";
