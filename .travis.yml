@@ -5,9 +5,12 @@ matrix:
   - os: linux
   - os: osx
 before_script:
-- sudo mount -o remount,exec,size=4G,mode=755 /run/user || true
 - sudo mkdir -p /etc/nix
 - echo "trusted-users = root $USER" | sudo tee -a /etc/nix/nix.conf
+- echo "substituters = https://cache.nixos.org https://nixcache.reflex-frp.org" | sudo tee -a /etc/nix/nix.conf
+- echo "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" | sudo tee -a /etc/nix/nix.conf
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "sandbox = false" | sudo tee -a /etc/nix/nix.conf ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "sandbox = true" | sudo tee -a /etc/nix/nix.conf ; fi
 - sudo launchctl kickstart -k system/org.nixos.nix-daemon || true
 script:
 - nix-env -if https://github.com/cachix/cachix/tarball/master --extra-substituters
@@ -16,7 +19,7 @@ script:
 - cachix use conklech-reflex
 - cachix push conklech-reflex --watch-store&
 - set -e
-- nix-env -i -f ./default.nix -A command | cachix push conklech-reflex
+- nix-env -i -f ./default.nix -A command
 - mkdir -p build
 - cd build
 - ob init
