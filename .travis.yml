@@ -1,4 +1,3 @@
-# bump
 language: nix
 sudo: required
 matrix:
@@ -20,10 +19,11 @@ script:
 - cachix use conklech-reflex
 - cachix push conklech-reflex --watch-store&
 - set -e
-- nix-env -i -f ./default.nix -A command
-- mkdir -p build
-- cd build
-- ob init
+- nix-build ./default.nix -A command
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-backend
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-frontend
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-run
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-migration
 env:
   global:
     secure: nRJ1DIbL3WWqkppzrbQNrFLmGk7pV8BEFHEAy6DtMbAVXknA0DLmsWXXYODXvgngroUcMNgElTWmZ8idRupUQ+lWJzy6UTl4Zruhe3EmhcOPN8HniUix/TwDtdbCkKWotvOELf5F96BmzcnSCbxvJGSuSHQrpLqs+B6o3L6w3GDmVHoDO9rppoNpGctW0hS0+jk3MPpe+a+F4DCMUH1lzy2UyfCz4yiYP89tBcesdmsuXSIMVFfKaJ9VlN1VePku/I1/VwHpxy52ZpSw4Lz1jSiR08xXxYXZ37Ey9mCweYbxNkXS521E2tNyhYy3IwBLCrpIjujlP/TSTfefngTZtaYntelmNOWIXvocx0NdGS6j4VFeoUVxqWxVAaUF+YjVh+zpu7ciXnTcVTRdnKz18xruNcgN5cJvCZI/mGwmBLYSmCxmQ1V3VcbH8bn/0W5+ilDQZ1MyLu80kXioVyGupJ63BCIsNB8rteh9Nvcx/jYzT3MRE4EL5V4wqZVmBPb8XbNIFd3Y5PtJIVyN3UR85NbsePJtXdzLm4jNuko71Ocz1ERUUImEumuV7NUbvtOgPgFEM3FEEAN68dV8IixzySP8EigycQmaeRj521iy5/KRFH3nmKBoRFJTA8bMJMfrj4WRSHzwEtsmxKJ+N31xRH5v7wbS/iwgOul4f+X5YgM=
