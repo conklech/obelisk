@@ -20,8 +20,9 @@ script:
 - cachix push conklech-reflex --watch-store&
 - set -e
 - nix-build ./default.nix -A command
-- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-backend
-- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-frontend
+- nix-build ./skeleton/default.nix -A ghc.backend
+- nix-build ./skeleton/default.nix -A ghc.frontend
+- nix-build ./skeleton/default.nix -A ghcjs.frontend
 - nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-run
 - nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-migration
 env:
