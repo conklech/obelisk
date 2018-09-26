@@ -1,0 +1,22 @@
+language: nix
+sudo: required
+matrix:
+  include:
+  - os: linux
+  - os: osx
+before_script:
+- sudo mkdir -p /etc/nix
+- echo "trusted-users = root $USER" | sudo tee -a /etc/nix/nix.conf
+- echo "substituters = https://cache.nixos.org https://nixcache.reflex-frp.org" | sudo tee -a /etc/nix/nix.conf
+- echo "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" | sudo tee -a /etc/nix/nix.conf
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "sandbox = false" | sudo tee -a /etc/nix/nix.conf ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "sandbox = true" | sudo tee -a /etc/nix/nix.conf ; fi
+- sudo launchctl kickstart -k system/org.nixos.nix-daemon || true
+script:
+- set -e
+- nix-build ./default.nix -A command
+- nix-build ./skeleton/default.nix -A ghc.backend
+- nix-build ./skeleton/default.nix -A ghc.frontend
+- nix-build ./skeleton/default.nix -A ghcjs.frontend
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-run
+- nix-build ./default.nix -A haskellPackageSets.ghc.obelisk-migration
